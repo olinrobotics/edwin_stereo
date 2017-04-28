@@ -257,7 +257,6 @@ void dist2pcl(Mat& dist, Mat& frame, sensor_msgs::PointCloud2& msg){
 
 	int n = dist.rows * dist.cols;
 	msg.data.resize(n*sizeof(pcl_layout));
-	//Parallel_cvImg2ROSPCL(dist,frame,msg)(Range{0,n});
 
 	msg.is_dense = false; // there may be invalid points	
 

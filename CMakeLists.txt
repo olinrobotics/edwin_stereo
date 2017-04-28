@@ -5,8 +5,9 @@ project(edwin_stereo)
 ## FIND YAML-CPP ##
 ###################
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/edwin_moveit_config/cmake/modules/")
-find_package(YAML REQUIRED)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/edwin_stereo/cmake/modules/")
+#find_package(YAML-CPP REQUIRED PATHS "/home/jamiecho/Documents/yaml-cpp_build" NO_DEFAULT_PATH)
+find_package(YAML-CPP REQUIRED)
 ###################
 
 ###################
@@ -17,7 +18,10 @@ if ("$ENV{CV3_DIR}" STREQUAL "")
 else()
 	set(CV3_DIR "$ENV{CV3_DIR}")
 endif()
+
 MESSAGE( STATUS "CV3_DIR : " ${CV3_DIR})
+MESSAGE( STATUS "YAML_LIB : " ${YAML_CPP_LIBRARIES})
+
 find_package(OpenCV 3.2.0 REQUIRED PATHS ${CV3_DIR} NO_DEFAULT_PATH)
 ###################
 
@@ -155,11 +159,11 @@ catkin_package(
 include_directories(
 	include/
 	${catkin_INCLUDE_DIRS}
-	${YAML_INCLUDE_DIRS}
+	${YAML_CPP_INCLUDE_DIRS}
 	)
 
 add_library(rectifier src/rectifier.cpp)
-target_link_libraries(rectifier ${OpenCV_LIBS} ${YAML_LIBRARY} pthread)
+target_link_libraries(rectifier ${OpenCV_LIBS} ${YAML_CPP_LIBRARIES} pthread)
 
 add_library(f_sgbm src/f_sgbm.cpp)
 target_link_libraries(f_sgbm ${OpenCV_LIBS} pthread)
