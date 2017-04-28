@@ -44,7 +44,7 @@ Rectifier::Rectifier(const string& param_l, const string& param_r){
 	double cy = p_l.at<float>(1,2);
 	double fy = p_l.at<float>(1,1);
 	double Tx = p_r.at<float>(0,3) / p_r.at<float>(0,0);
-	double rcx = p_l.at<float>(0,2);
+	double rcx = p_r.at<float>(0,2);
 
 	//printf("fx: %f; cx: %f; cy: %f; fy: %f; Tx: %f; rcx: %f\n", fx,cx,cy,fy,Tx,rcx);
 
