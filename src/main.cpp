@@ -41,7 +41,7 @@ struct MinMaxRange{
 struct ObjectCriteria{
 	ObjectCriteria(){
 		// setup default parameters
-		area_range.min = 0.005;
+		area_range.min = 0.003;
 		area_range.max = 1.0;
 		dist_range.min = 0.0;
 		dist_range.max = 1.5;
@@ -290,6 +290,7 @@ void callback(edwin_stereo::EdwinStereoConfig& config, uint32_t level){
 	hsv1_h[1] = config.s1_h;
 	hsv1_l[2] = config.v1_l;
 	hsv1_h[2] = config.v1_h;
+	params.area_range.min = config.min_area;
 }
 
 string type2str(int type) {
@@ -339,7 +340,7 @@ int main(int argc, char* argv[])
 
 	double vis_mult = 2.0;
 
-	auto cap_l = cv::VideoCapture(0);
+	auto cap_l = cv::VideoCapture(1);
 	if(!cap_l.isOpened()){
 		ROS_ERROR("LEFT CAMERA CANNOT BE OPENED");
 		return -1;
