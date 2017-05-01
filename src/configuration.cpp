@@ -58,6 +58,7 @@ void Configuration::global_cb(edwin_stereo::EdwinStereoConfig& config, uint32_t 
 			fine_cb(this->c_f, 0);
 		}
 	}
+	solidity = config.solidity;
 }
 
 void Configuration::coarse_cb(edwin_stereo::EdwinStereoCoarseConfig& config, uint32_t level){

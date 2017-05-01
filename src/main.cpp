@@ -34,7 +34,7 @@ std::shared_ptr<Configuration> configuration;
 
 struct LabelData{
 	int cX, cY;
-	float d, a, p_a;
+	float d, a, p_a, s;
 };
 
 void putCenteredText(Mat& frame,const std::string& text,const Point& center){
@@ -76,17 +76,8 @@ void apply_criteria(Mat& dist, Mat& frame, ObjectCriteria& params, Mat& output, 
 
 	Mat h1, h2;
 	for(auto& r : params.hsv_range){
-		//printf("[MIN] H : %d, S : %d, V : %d ;; ", r.min[0], r.min[1], r.min[2]);
-		//printf("[MAX] H : %d, S : %d, V : %d\n", r.max[0], r.max[1], r.max[2]);
 		inRange(hsv,r.min,r.max,t);
-		//cv::bitwise_or(c_mask,t,c_mask);
-		//cv::bitwise_not(t,t);
 		c_mask.setTo(255, t);
-		if(configuration->verbose){
-			std::sprintf(wnd_txt, "t_%d", ++cnt);
-			namedWindow(wnd_txt);
-			imshow(wnd_txt, t);
-		}
 	}
 
 	// distance
@@ -105,6 +96,8 @@ void apply_criteria(Mat& dist, Mat& frame, ObjectCriteria& params, Mat& output, 
 	labels.clear();
 	int ctr_idx = 0;
 	for(auto& ctr : ctrs){
+		vector<Point> hull;
+
 		auto m = moments(ctr);
 		if(fabs(m.m00) > 1e-6){
 			float p_a = contourArea(ctr);
@@ -114,11 +107,16 @@ void apply_criteria(Mat& dist, Mat& frame, ObjectCriteria& params, Mat& output, 
 			float d = dist.at<float>(cY,cX);
 			float a = p_a * d * 1.5e-6; // magic scaling factor
 			if(params.area_range.min <= a && a < params.area_range.max){
-				// fill in mask
-				drawContours(mask, ctrs, ctr_idx, Scalar::all(255), -1);
-				labels.push_back({
-						cX,cY,d,a,p_a
-						});
+				convexHull(ctr, hull, false);
+				float h_a = contourArea(hull);
+				float s = (p_a / h_a);
+				if(s > configuration->solidity){
+					// fill in mask
+					drawContours(mask, ctrs, ctr_idx, Scalar::all(255), -1);
+					labels.push_back({
+							cX,cY,d,a,p_a,s
+							});
+				}
 			}
 		}
 		++ctr_idx;
@@ -133,15 +131,18 @@ void apply_criteria(Mat& dist, Mat& frame, ObjectCriteria& params, Mat& output, 
 	for(auto& label : labels){
 		char text_d[64] = {};
 		char text_a[64] = {};
+		char text_s[64] = {};
 
 		std::sprintf(text_d, "d : %.2f", label.d);
 		std::sprintf(text_a, "a : %.2f", label.a);
+		std::sprintf(text_s, "s : %.2f", label.s);
 
 		auto center = Point(label.cX, label.cY);
 		circle(res, center, sqrt(label.p_a), Scalar(255,255,255), 2);
 
 		putCenteredText(res, (string)text_d, center);
 		putCenteredText(res, (string)text_a, Point(center.x,center.y+20));
+		putCenteredText(res, (string)text_s, Point(center.x,center.y+40));
 	}
 
 	output = res.clone();
@@ -347,7 +348,7 @@ int main(int argc, char* argv[])
 
 		if(configuration->verbose){
 			imshow("left", rect_left);
-			imshow("right", right);
+			imshow("right", rect_right);
 			imshow("raw_disp", filtered_raw_disp_vis);
 			imshow("disp", filtered_disp_vis);
 			imshow("filtered", filtered);

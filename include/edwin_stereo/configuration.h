@@ -30,6 +30,7 @@ class Configuration{
 		bool verbose;
 		bool pcl;
 		bool coarse;
+		float solidity;
 
 		void global_cb(edwin_stereo::EdwinStereoConfig& config, uint32_t level);
 		void coarse_cb(edwin_stereo::EdwinStereoCoarseConfig& config, uint32_t level);
