@@ -14,6 +14,8 @@
 /* Custom OpenCV */
 #include "edwin_stereo/rectifier.h"
 #include "edwin_stereo/f_sgbm.h"
+#include "edwin_stereo/ObjectCriteria.h"
+#include "edwin_stereo/configuration.h"
 
 /* ROS */
 #include "ros/ros.h"
@@ -25,46 +27,10 @@
 
 #include "geometry_msgs/PointStamped.h"
 
-#include <dynamic_reconfigure/server.h>
-#include <edwin_stereo/EdwinStereoConfig.h>
-
-
 using namespace cv;
 using namespace std;
 
-template<typename T>
-struct MinMaxRange{
-	T min;
-	T max;
-};
-
-struct ObjectCriteria{
-	ObjectCriteria(){
-		// setup default parameters
-		area_range.min = 0.003;
-		area_range.max = 1.0;
-		dist_range.min = 0.0;
-		dist_range.max = 1.5;
-
-		MinMaxRange<Vec3b> hsv1;
-		hsv1.min = Vec3b(0,0,0);
-		hsv1.max = Vec3b(255,255,255);
-
-		MinMaxRange<Vec3b> hsv2;
-		hsv2.min = Vec3b(0,0,0);
-		hsv2.max = Vec3b(0,0,0);
-
-		hsv_range.push_back(hsv1);
-		hsv_range.push_back(hsv2);
-	}
-	// color
-	std::vector<MinMaxRange<Vec3b>> hsv_range;
-
-	// distance
-	MinMaxRange<float> dist_range;
-
-	MinMaxRange<float> area_range;
-};
+std::shared_ptr<Configuration> configuration;
 
 struct LabelData{
 	int cX, cY;
@@ -105,10 +71,22 @@ void apply_criteria(Mat& dist, Mat& frame, ObjectCriteria& params, Mat& output, 
 	cv::cvtColor(blur,hsv,COLOR_BGR2HSV);
 
 	Mat t;
-	Mat t2;
+	int cnt = 0;
+	char wnd_txt[64];
+
+	Mat h1, h2;
 	for(auto& r : params.hsv_range){
+		//printf("[MIN] H : %d, S : %d, V : %d ;; ", r.min[0], r.min[1], r.min[2]);
+		//printf("[MAX] H : %d, S : %d, V : %d\n", r.max[0], r.max[1], r.max[2]);
 		inRange(hsv,r.min,r.max,t);
+		//cv::bitwise_or(c_mask,t,c_mask);
+		//cv::bitwise_not(t,t);
 		c_mask.setTo(255, t);
+		if(configuration->verbose){
+			std::sprintf(wnd_txt, "t_%d", ++cnt);
+			namedWindow(wnd_txt);
+			imshow(wnd_txt, t);
+		}
 	}
 
 	// distance
@@ -202,7 +180,7 @@ class Parallel_cvImg2ROSPCL: public cv::ParallelLoopBody{
 				int i_3 = i*3;
 				float z = xyz_ptr[i_3+2];
 				auto& m= msg_ptr[i];
-				if (z <= 100 && !std::isinf(z)){ // 10000 = MISSING_Z
+				if (z <= 10 && !std::isinf(z)){ // 10000 = MISSING_Z
 					m.x = xyz_ptr[i_3+2];
 					m.y = -xyz_ptr[i_3];
 					m.z = -xyz_ptr[i_3+1];
@@ -263,36 +241,6 @@ void dist2pcl(Mat& dist, Mat& frame, sensor_msgs::PointCloud2& msg){
 	parallel_for_(Range{0,dist.rows * dist.cols}, Parallel_cvImg2ROSPCL(dist, frame, msg), 8);
 }
 
-bool verbose = false;
-bool pcl = false;
-ObjectCriteria params;
-
-void callback(edwin_stereo::EdwinStereoConfig& config, uint32_t level){
-	verbose = config.verbose;
-	pcl = config.pcl;
-	ROS_INFO("[Reconfigure Request] Verbose : %s; PCL : %s", (verbose?"True":"False"),(pcl?"True":"False"));
-
-	if(verbose){
-		namedWindow("left", WINDOW_AUTOSIZE);
-		namedWindow("right", WINDOW_AUTOSIZE);
-		namedWindow("raw_disp", WINDOW_AUTOSIZE);
-		namedWindow("disp", WINDOW_AUTOSIZE);
-		namedWindow("filtered", WINDOW_AUTOSIZE);
-	}else{
-		destroyAllWindows();
-	}
-
-	auto& hsv1_l = params.hsv_range[0].min;
-	auto& hsv1_h = params.hsv_range[0].max;
-	hsv1_l[0] = config.h1_l;
-	hsv1_h[0] = config.h1_h;
-	hsv1_l[1] = config.s1_l;
-	hsv1_h[1] = config.s1_h;
-	hsv1_l[2] = config.v1_l;
-	hsv1_h[2] = config.v1_h;
-	params.area_range.min = config.min_area;
-}
-
 string type2str(int type) {
 	string r;
 
@@ -319,7 +267,22 @@ string type2str(int type) {
 int main(int argc, char* argv[])
 {
 	ros::init(argc, argv, "edwin_stereo");
+
+	configuration = std::make_shared<Configuration>();
+
 	ros::NodeHandle nh;
+
+	// GET CAMERA DEVICE NAMES ...
+	std::string dev_l, dev_r; 
+
+	if( !ros::param::get("~dev_l", dev_l) || \
+		!ros::param::get("~dev_r", dev_r)){
+		ROS_WARN("Failed To Retrieve Device Names; Going with default");
+		dev_l = "/dev/video1";
+		dev_r = "/dev/video2";
+	}
+
+	ROS_INFO("dev_l = %s, dev_r = %s", dev_l.c_str(), dev_r.c_str());
 
 	ros::Publisher obj_pub;
 	geometry_msgs::PointStamped obj_msg;
@@ -333,21 +296,16 @@ int main(int argc, char* argv[])
 
 	std::string path = ros::package::getPath("edwin_stereo");
 
-	dynamic_reconfigure::Server<edwin_stereo::EdwinStereoConfig> server;
-	dynamic_reconfigure::Server<edwin_stereo::EdwinStereoConfig>::CallbackType f;
-	f = boost::bind(&callback, _1, _2);
-	server.setCallback(f);
-
 	double vis_mult = 2.0;
 
-	auto cap_l = cv::VideoCapture(1);
+	auto cap_l = cv::VideoCapture(dev_l);
 	if(!cap_l.isOpened()){
-		ROS_ERROR("LEFT CAMERA CANNOT BE OPENED");
+		ROS_ERROR("LEFT CAMERA COULD NOT BE OPENED");
 		return -1;
 	}
-	auto cap_r = cv::VideoCapture(2);
+	auto cap_r = cv::VideoCapture(dev_r);
 	if(!cap_l.isOpened()){
-		ROS_ERROR("RIGHT CAMERA CANNOT BE OPENED");
+		ROS_ERROR("RIGHT CAMERA COULD NOT BE OPENED");
 		return -1;
 	}
 	Mat left,right;
@@ -364,7 +322,7 @@ int main(int argc, char* argv[])
 	Mat filtered;
 
 	// TODO : Dynamically Configure
-	
+
 	Mat filtered_disp_vis;
 	Mat filtered_raw_disp_vis;
 	Mat xyz[3];
@@ -382,12 +340,12 @@ int main(int argc, char* argv[])
 		r.convert(disp, dist);
 		split(dist, xyz);
 
-		apply_criteria(xyz[2],rect_left,params,filtered,labels);
+		apply_criteria(xyz[2],rect_left,configuration->params,filtered,labels);
 
 		getDisparityVis(disp,filtered_disp_vis,vis_mult);
 		getDisparityVis(raw_disp,filtered_raw_disp_vis,vis_mult);
 
-		if(verbose){
+		if(configuration->verbose){
 			imshow("left", rect_left);
 			imshow("right", right);
 			imshow("raw_disp", filtered_raw_disp_vis);
@@ -395,7 +353,7 @@ int main(int argc, char* argv[])
 			imshow("filtered", filtered);
 		}
 
-		if(pcl){
+		if(configuration->pcl){
 			dist2pcl(dist, left, pcl_msg);
 			pcl_pub.publish(pcl_msg);
 		}

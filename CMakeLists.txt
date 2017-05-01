@@ -131,6 +131,8 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate dynamic reconfigure parameters in the 'cfg' folder
 generate_dynamic_reconfigure_options(
 	cfg/EdwinStereo.cfg
+	cfg/EdwinStereoCoarse.cfg
+	cfg/EdwinStereoFine.cfg
 )
 
 ###################################
@@ -168,7 +170,7 @@ target_link_libraries(rectifier ${OpenCV_LIBS} ${YAML_CPP_LIBRARIES} pthread)
 add_library(f_sgbm src/f_sgbm.cpp)
 target_link_libraries(f_sgbm ${OpenCV_LIBS} pthread)
 
-add_executable(edwin_stereo src/main.cpp)
+add_executable(edwin_stereo src/main.cpp src/configuration.cpp src/ObjectCriteria.cpp)
 target_link_libraries(edwin_stereo ${OpenCV_LIBS} ${catkin_LIBRARIES} pthread rectifier f_sgbm)#
 
 add_dependencies(edwin_stereo ${PROJECT_NAME}_gencfg)
