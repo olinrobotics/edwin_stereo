@@ -124,11 +124,11 @@ void Configuration::coarse_cb(edwin_stereo::EdwinStereoCoarseConfig& config, uin
 
 			// S
 			hsv1_l[1] = hsv2_l[1] = 145;
-			hsv1_h[1] = hsv2_h[1] = 256;
+			hsv1_h[1] = hsv2_h[1] = 255;
 
 			// V
 			hsv1_l[2] = hsv2_l[2] = 210;
-			hsv1_h[2] = hsv2_h[2] = 256;
+			hsv1_h[2] = hsv2_h[2] = 255;
 			break;
 		case edwin_stereo::EdwinStereoCoarse_Yellow: // Yellow
 			// H
@@ -141,20 +141,7 @@ void Configuration::coarse_cb(edwin_stereo::EdwinStereoCoarseConfig& config, uin
 
 			// V
 			hsv1_l[2] = hsv2_l[2] = 180;
-			hsv1_h[2] = hsv2_h[2] = 256;
-			break;
-		case edwin_stereo::EdwinStereoCoarse_Pink: // Hot Pink
-			// H
-			hsv1_l[0] = hsv2_l[0] = 160;
-			hsv1_h[0] = hsv2_h[0] = 180;
-
-			// S
-			hsv1_l[1] = hsv2_l[1] = 160;
-			hsv1_h[1] = hsv2_h[1] = 200;
-
-			// V
-			hsv1_l[2] = hsv2_l[2] = 200;
-			hsv1_h[2] = hsv2_h[2] = 256;
+			hsv1_h[2] = hsv2_h[2] = 255;
 			break;
 		case edwin_stereo::EdwinStereoCoarse_Purple: // Violet
 			// H
@@ -169,6 +156,19 @@ void Configuration::coarse_cb(edwin_stereo::EdwinStereoCoarseConfig& config, uin
 			hsv1_l[2] = hsv2_l[2] = 0;
 			hsv1_h[2] = hsv2_h[2] = 100;
 			break;
+		case edwin_stereo::EdwinStereoCoarse_Pink: // Hot Pink
+			// H
+			hsv1_l[0] = hsv2_l[0] = 160;
+			hsv1_h[0] = hsv2_h[0] = 180;
+
+			// S
+			hsv1_l[1] = hsv2_l[1] = 160;
+			hsv1_h[1] = hsv2_h[1] = 200;
+
+			// V
+			hsv1_l[2] = hsv2_l[2] = 200;
+			hsv1_h[2] = hsv2_h[2] = 255;
+			break;
 		case edwin_stereo::EdwinStereoCoarse_Black: // Black
 			// H
 			hsv1_l[0] = hsv2_l[0] = 0;
@@ -176,31 +176,27 @@ void Configuration::coarse_cb(edwin_stereo::EdwinStereoCoarseConfig& config, uin
 
 			// S
 			hsv1_l[1] = hsv2_l[1] = 0;
-			hsv1_h[1] = hsv2_h[1] = 256;
+			hsv1_h[1] = hsv2_h[1] = 255;
 
 			// V
 			hsv1_l[2] = hsv2_l[2] = 0;
 			hsv1_h[2] = hsv2_h[2] = 35;
-			break;
-		case edwin_stereo::EdwinStereoCoarse_White:
-			break;
-		case edwin_stereo::EdwinStereoCoarse_Grey:
 			break;
 
 	}
 
 	switch(config.size){
 		case edwin_stereo::EdwinStereoCoarse_Small:
-			params.area_range.min = 0.0005;
-			params.area_range.max = 0.0015;
+			params.area_range.min = 0.0004;
+			params.area_range.max = 0.0008;
 			break;
 		case edwin_stereo::EdwinStereoCoarse_Medium:
 			params.area_range.min = 0.001;
-			params.area_range.max = 0.005;
+			params.area_range.max = 0.0015;
 			break;
 		case edwin_stereo::EdwinStereoCoarse_Large:
-			params.area_range.min = 0.004;
-			params.area_range.max = 0.01;
+			params.area_range.min = 0.002;
+			params.area_range.max = 0.003;
 			break;
 		case edwin_stereo::EdwinStereoCoarse_ExtraLarge:
 			params.area_range.min = 0.008;
@@ -208,8 +204,9 @@ void Configuration::coarse_cb(edwin_stereo::EdwinStereoCoarseConfig& config, uin
 			break;
 	}
 
+	// not exactly exposed :)
 	params.dist_range.min = 0.0;
-	params.dist_range.max = 5.0;
+	params.dist_range.max = 2.0;
 }
 
 void Configuration::fine_cb(edwin_stereo::EdwinStereoFineConfig& config, uint32_t level){
