@@ -133,6 +133,7 @@ generate_dynamic_reconfigure_options(
 	cfg/EdwinStereo.cfg
 	cfg/EdwinStereoCoarse.cfg
 	cfg/EdwinStereoFine.cfg
+	cfg/EdwinFrames.cfg
 )
 
 ###################################

@@ -134,7 +134,7 @@ void apply_criteria(Mat& dist, Mat& frame, ObjectCriteria& params, Mat& output, 
 		char text_s[64] = {};
 
 		std::sprintf(text_d, "d : %.2f", label.d);
-		std::sprintf(text_a, "a : %.2f", label.a);
+		std::sprintf(text_a, "a : %.2f", label.a * 1000);
 		std::sprintf(text_s, "s : %.2f", label.s);
 
 		auto center = Point(label.cX, label.cY);
@@ -347,11 +347,22 @@ int main(int argc, char* argv[])
 		getDisparityVis(raw_disp,filtered_raw_disp_vis,vis_mult);
 
 		if(configuration->verbose){
-			imshow("left", rect_left);
-			imshow("right", rect_right);
-			imshow("raw_disp", filtered_raw_disp_vis);
-			imshow("disp", filtered_disp_vis);
-			imshow("filtered", filtered);
+			auto& show = configuration->c_fr;
+			if(show.left){
+				imshow("left", rect_left);
+			}
+			if(show.right){
+				imshow("right", rect_right);
+			}
+			if(show.raw_disp){
+				imshow("raw_disp", filtered_raw_disp_vis);
+			}
+			if(show.disp){
+				imshow("disp", filtered_disp_vis);
+			}
+			if(show.filtered){
+				imshow("filtered", filtered);
+			}
 		}
 
 		if(configuration->pcl){

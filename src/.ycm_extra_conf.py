@@ -83,7 +83,9 @@ flags = [
 '-I',
 '/usr/include',
 '-I',
-'/usr/local/include'
+'/usr/local/include',
+'-I',
+'../include/'
 ]
 
 

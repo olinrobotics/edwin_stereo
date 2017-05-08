@@ -15,8 +15,8 @@
 #include "edwin_stereo/configuration.h"
 
 Configuration::Configuration():
-	nh_global("~"), nh_coarse("~/coarse"), nh_fine("~/fine"),
-	s_g(nh_global), s_c(nh_coarse), s_f(nh_fine)
+	nh_global("~"), nh_coarse("~/coarse"), nh_fine("~/fine"), nh_frames("~/frames"),
+	s_g(nh_global), s_c(nh_coarse), s_f(nh_fine), s_fr(nh_frames)
 {
 
 	// global
@@ -33,6 +33,10 @@ Configuration::Configuration():
 	dynamic_reconfigure::Server<edwin_stereo::EdwinStereoFineConfig>::CallbackType f_f;
 	f_f = boost::bind(&Configuration::fine_cb, this, _1, _2);
 	s_f.setCallback(f_f);
+
+	dynamic_reconfigure::Server<edwin_stereo::EdwinFramesConfig>::CallbackType f_fr;
+	f_fr = boost::bind(&Configuration::frames_cb, this, _1, _2);
+	s_fr.setCallback(f_fr);
 }
 
 void Configuration::global_cb(edwin_stereo::EdwinStereoConfig& config, uint32_t level){
@@ -113,6 +117,19 @@ void Configuration::coarse_cb(edwin_stereo::EdwinStereoCoarseConfig& config, uin
 			hsv1_l[2] = hsv2_l[2] = 100;
 			hsv1_h[2] = hsv2_h[2] = 255;
 			break;
+		case edwin_stereo::EdwinStereoCoarse_Orange:
+			break;
+		case edwin_stereo::EdwinStereoCoarse_Yellow:
+			break;
+		case edwin_stereo::EdwinStereoCoarse_Purple:
+			break;
+		case edwin_stereo::EdwinStereoCoarse_Black:
+			break;
+		case edwin_stereo::EdwinStereoCoarse_White:
+			break;
+		case edwin_stereo::EdwinStereoCoarse_Grey:
+			break;
+
 	}
 
 	switch(config.size){
@@ -175,4 +192,18 @@ void Configuration::fine_cb(edwin_stereo::EdwinStereoFineConfig& config, uint32_
 	params.area_range.max = config.max_area;
 	params.dist_range.min = config.min_dist;
 	params.dist_range.max = config.max_dist;
+}
+
+void Configuration::frames_cb(edwin_stereo::EdwinFramesConfig& config, uint32_t level){
+	this->c_fr = config;
+	if(!config.left)
+		destroyWindow("left");
+	if(!config.right)
+		destroyWindow("right");
+	if(!config.disp)
+		destroyWindow("disp");
+	if(!config.raw_disp)
+		destroyWindow("raw_disp");
+	if(!config.filtered)
+		destroyWindow("filtered");
 }
