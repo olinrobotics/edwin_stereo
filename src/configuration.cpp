@@ -80,50 +80,107 @@ void Configuration::coarse_cb(edwin_stereo::EdwinStereoCoarseConfig& config, uin
 			// H
 			hsv1_l[0] = 0;
 			hsv1_h[0] = 10;
-			hsv2_l[0] = 170;
+			hsv2_l[0] = 165;
 			hsv2_h[0] = 180;
 
 			// S
-			hsv1_l[1] = hsv2_l[1] = 50;
-			hsv1_h[1] = hsv2_h[1] = 255;
+			hsv1_l[1] = hsv2_l[1] = 210;
+			hsv1_h[1] = hsv2_h[1] = 220;
 
 			// V
-			hsv1_l[2] = hsv2_l[2] = 50;
-			hsv1_h[2] = hsv2_h[2] = 255;
+			hsv1_l[2] = hsv2_l[2] = 165;
+			hsv1_h[2] = hsv2_h[2] = 200;
 			break;
-		case edwin_stereo::EdwinStereoCoarse_Green: // Blue
+		case edwin_stereo::EdwinStereoCoarse_Green: // Green
 			// H
-			hsv1_l[0] = hsv2_l[0] = 40;
+			hsv1_l[0] = hsv2_l[0] = 45;
 			hsv1_h[0] = hsv2_h[0] = 80;
 
 			// S
-			hsv1_l[1] = hsv2_l[1] = 80;
-			hsv1_h[1] = hsv2_h[1] = 255;
+			hsv1_l[1] = hsv2_l[1] = 40;
+			hsv1_h[1] = hsv2_h[1] = 190;
 
 			// V
-			hsv1_l[2] = hsv2_l[2] = 100;
-			hsv1_h[2] = hsv2_h[2] = 255;
+			hsv1_l[2] = hsv2_l[2] = 140;
+			hsv1_h[2] = hsv2_h[2] = 215;
 			break;
-		case edwin_stereo::EdwinStereoCoarse_Blue: // Green
+		case edwin_stereo::EdwinStereoCoarse_Blue: // Blue
 			// H
-			hsv1_l[0] = hsv2_l[0] = 85;
-			hsv1_h[0] = hsv2_h[0] = 135;
+			hsv1_l[0] = hsv2_l[0] = 100;
+			hsv1_h[0] = hsv2_h[0] = 120;
+
+			// S
+			hsv1_l[1] = hsv2_l[1] = 120;
+			hsv1_h[1] = hsv2_h[1] = 200;
+
+			// V
+			hsv1_l[2] = hsv2_l[2] = 45;
+			hsv1_h[2] = hsv2_h[2] = 95;
+			break;
+		case edwin_stereo::EdwinStereoCoarse_Orange: // Orange
+			// H
+			hsv1_l[0] = hsv2_l[0] = 0;
+			hsv1_h[0] = hsv2_h[0] = 16;
+
+			// S
+			hsv1_l[1] = hsv2_l[1] = 145;
+			hsv1_h[1] = hsv2_h[1] = 256;
+
+			// V
+			hsv1_l[2] = hsv2_l[2] = 210;
+			hsv1_h[2] = hsv2_h[2] = 256;
+			break;
+		case edwin_stereo::EdwinStereoCoarse_Yellow: // Yellow
+			// H
+			hsv1_l[0] = hsv2_l[0] = 20;
+			hsv1_h[0] = hsv2_h[0] = 30;
+
+			// S
+			hsv1_l[1] = hsv2_l[1] = 95;
+			hsv1_h[1] = hsv2_h[1] = 190;
+
+			// V
+			hsv1_l[2] = hsv2_l[2] = 180;
+			hsv1_h[2] = hsv2_h[2] = 256;
+			break;
+		case edwin_stereo::EdwinStereoCoarse_Pink: // Hot Pink
+			// H
+			hsv1_l[0] = hsv2_l[0] = 160;
+			hsv1_h[0] = hsv2_h[0] = 180;
+
+			// S
+			hsv1_l[1] = hsv2_l[1] = 160;
+			hsv1_h[1] = hsv2_h[1] = 200;
+
+			// V
+			hsv1_l[2] = hsv2_l[2] = 200;
+			hsv1_h[2] = hsv2_h[2] = 256;
+			break;
+		case edwin_stereo::EdwinStereoCoarse_Purple: // Violet
+			// H
+			hsv1_l[0] = hsv2_l[0] = 130;
+			hsv1_h[0] = hsv2_h[0] = 150;
 
 			// S
 			hsv1_l[1] = hsv2_l[1] = 80;
-			hsv1_h[1] = hsv2_h[1] = 255;
+			hsv1_h[1] = hsv2_h[1] = 150;
 
 			// V
-			hsv1_l[2] = hsv2_l[2] = 100;
-			hsv1_h[2] = hsv2_h[2] = 255;
+			hsv1_l[2] = hsv2_l[2] = 0;
+			hsv1_h[2] = hsv2_h[2] = 100;
 			break;
-		case edwin_stereo::EdwinStereoCoarse_Orange:
-			break;
-		case edwin_stereo::EdwinStereoCoarse_Yellow:
-			break;
-		case edwin_stereo::EdwinStereoCoarse_Purple:
-			break;
-		case edwin_stereo::EdwinStereoCoarse_Black:
+		case edwin_stereo::EdwinStereoCoarse_Black: // Black
+			// H
+			hsv1_l[0] = hsv2_l[0] = 0;
+			hsv1_h[0] = hsv2_h[0] = 180;
+
+			// S
+			hsv1_l[1] = hsv2_l[1] = 0;
+			hsv1_h[1] = hsv2_h[1] = 256;
+
+			// V
+			hsv1_l[2] = hsv2_l[2] = 0;
+			hsv1_h[2] = hsv2_h[2] = 35;
 			break;
 		case edwin_stereo::EdwinStereoCoarse_White:
 			break;
